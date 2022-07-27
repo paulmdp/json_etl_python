@@ -9,7 +9,6 @@
 
 import json
 import requests
-
 import matplotlib.pyplot as plt
 
 
@@ -28,7 +27,6 @@ if __name__ == '__main__':
     # 3) En cada entrada se especifica si el usuario completó ese título,
     # mediante el campo "completed".
 
-
     # Alumno, de cada usuario en el total de las 200 entradas
     # debe contar cuantos títulos completó cada usuario (de los 10 posibles)
     # y armar un gráfico de barras resumiendo la información.
@@ -46,4 +44,46 @@ if __name__ == '__main__':
     # y verifique si los primeros usuarios (mirando la página a ojo)
     # los datos recolectados son correctos.
 
+    resultado = requests.get(url)
+    registros = resultado.json()
+   
+    users_x=[] #Lista de datos en X
+    data_y=[]  # Lista de datos en Y
+    completados=0
+    idusuario=1
+    
+    for x in registros:
+        if(int(x['userId']) == idusuario):  # Para los userId iguales
+            completed = bool(x['completed'])  
+            if(completed):
+                completados+=1 # Cuento los completados
+        else:
+            users_x.append(idusuario) #agrego a la lista de eje x
+            data_y.append(completados) #agrego a la lista de eje y
+            idusuario= int(x['userId'])
+            completados=0
+            completed = bool(x['completed']) 
+            if(completed):
+                completados+=1 
+         
+    users_x.append(idusuario) # Agrego a la lista de x el ultimo userId
+    data_y.append(completados)  # Agrego a la lista de y el ultimo contador de completados  
+    
+    print("Tabla de Datos")                
+    print("X =", users_x)
+    print("Y =", data_y)
+    
+### Gráfico ###
+    fig = plt.figure()
+    fig.suptitle('Libros completados por usuario', fontsize=14)
+    ax = fig.add_subplot()
+    ax.bar(users_x, data_y, color='green', label='Libros Leidos')
+    ax.set_facecolor('navajowhite')
+    ax.set_xlabel("ID Usuario")
+    ax.set_ylabel("Completados")
+    ax.grid(True, linestyle='--', color='grey')
+    ax.legend()
+    plt.xticks(users_x)
+    plt.show()    
+    
     print("terminamos")
